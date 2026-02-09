@@ -69,4 +69,41 @@ class ProductRepositoryTest
         assertEquals(product2.getProductId(), savedProduct.getProductId());
         assertFalse(productIterator.hasNext());
     }
+
+    @Test
+    void testUpdateExistentProduct()
+    {
+        Product product = new Product();
+        product.setProductId("cb678e9g-1c67-460e-8860-71af6af67bd9");
+        product.setProductName("Sampo Cap Udin");
+        product.setProductQuantity(67);
+        productRepository.create(product);
+
+        // Initialize another product with the same id.
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("cb678e9g-1c67-460e-8860-71af6af67bd9");
+        updatedProduct.setProductName("Sampo Cap Galih");
+        product.setProductQuantity(42);
+        productRepository.update(updatedProduct);
+
+        // Get the product in the repository with the same id. Make sure it is updated.
+        Product result = productRepository.findById("cb678e9g-1c67-460e-8860-71af6af67bd9");
+        assertNotNull(result);
+        assertEquals(updatedProduct.getProductName(), result.getProductName());
+        assertEquals(updatedProduct.getProductQuantity(), result.getProductQuantity());
+    }
+
+    @Test
+    void testUpdateNonExistentProduct()
+    {
+        // Try to update a product that does not exist in the repository
+        Product nonExistentProduct = new Product();
+        nonExistentProduct.setProductId("cb678e9g-1c67-460e-8860-71af6af67bd9");
+        nonExistentProduct.setProductName("Sampo Cap Udin");
+        nonExistentProduct.setProductQuantity(67);
+
+        Product result = productRepository.update(nonExistentProduct);
+
+        assertNull(result);
+    }
 }
