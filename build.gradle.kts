@@ -25,6 +25,7 @@ sonar {
     properties {
         property("sonar.projectKey", "A-Daffa-Rayhan-Ananda-2306152235_Modul-2-CI-CD")
         property("sonar.organization", "a-daffa-rayhan-ananda-2306152235")
+        property("sonar.host.url", "https://sonarcloud.io")
     }
 }
 
