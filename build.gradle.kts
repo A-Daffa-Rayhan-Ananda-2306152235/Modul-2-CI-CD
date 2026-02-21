@@ -26,6 +26,7 @@ sonar {
         property("sonar.projectKey", "A-Daffa-Rayhan-Ananda-2306152235_Modul-2-CI-CD")
         property("sonar.organization", "a-daffa-rayhan-ananda-2306152235")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
 
@@ -82,6 +83,11 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(true)
+    }
 }
 
 tasks.withType<Test>().configureEach {
