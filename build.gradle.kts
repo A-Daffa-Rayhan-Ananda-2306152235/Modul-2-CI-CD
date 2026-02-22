@@ -27,6 +27,7 @@ sonar {
         property("sonar.organization", "a-daffa-rayhan-ananda-2306152235")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+        property("sonar.sources", "src/main/java,src/main/resources")
     }
 }
 
