@@ -22,6 +22,7 @@ class ProductRepositoryTest
     {
 
     }
+
     @Test
     void testCreateAndFind()
     {
@@ -38,6 +39,31 @@ class ProductRepositoryTest
         assertEquals(product.getProductName(), savedProduct.getProductName());
         assertEquals(product.getProductQuantity(), savedProduct.getProductQuantity());
     }
+
+    @Test
+    void testCreateWithoutId() {
+        Product product = new Product();
+        product.setProductName("Sampo Tanpa ID");
+        product.setProductQuantity(10);
+
+        // This will trigger the if (product.getProductId() == null) block
+        productRepository.create(product);
+
+        assertNotNull(product.getProductId());
+        assertFalse(product.getProductId().isEmpty());
+    }
+
+    @Test
+    void testFindByIdNonExistentProduct() {
+        // Add one product but search for another
+        Product product = new Product();
+        product.setProductId("id-1-erer384-ljdslfwe-388");
+        productRepository.create(product);
+
+        Product result = productRepository.findById("id-2-29393993d-e575");
+        assertNull(result);
+    }
+
     @Test
     void testFindAllIfEmpty()
     {
@@ -83,7 +109,7 @@ class ProductRepositoryTest
         Product updatedProduct = new Product();
         updatedProduct.setProductId("cb678e9g-1c67-460e-8860-71af6af67bd9");
         updatedProduct.setProductName("Sampo Cap Galih");
-        product.setProductQuantity(42);
+        updatedProduct.setProductQuantity(42);
         productRepository.update(updatedProduct);
 
         // Get the product in the repository with the same id. Make sure it is updated.
@@ -94,16 +120,17 @@ class ProductRepositoryTest
     }
 
     @Test
-    void testUpdateNonExistentProduct()
-    {
-        // Try to update a product that does not exist in the repository
-        Product nonExistentProduct = new Product();
-        nonExistentProduct.setProductId("cb678e9g-1c67-460e-8860-71af6af67bd9");
-        nonExistentProduct.setProductName("Sampo Cap Udin");
-        nonExistentProduct.setProductQuantity(67);
+    void testUpdateNonExistentProduct() {
+        // Add a product
+        Product product = new Product();
+        product.setProductId("id-1-erer384-ljdslfwe-676767");
+        productRepository.create(product);
 
-        Product result = productRepository.update(nonExistentProduct);
+        // Try to update with an ID that doesn't exist
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("id-2-29393993d-e575-696969");
 
+        Product result = productRepository.update(updatedProduct);
         assertNull(result);
     }
 
