@@ -14,43 +14,43 @@ public class CarController {
     @Autowired
     private CarService carService;
 
-    @GetMapping("/createCar")
+    @GetMapping("/create")
     public String createCarPage(Model model) {
         Car car = new Car();
         model.addAttribute("car", car);
         return "CreateCar";
     }
 
-    @PostMapping("/createCar")
+    @PostMapping("/create")
     public String createCarPost(@ModelAttribute Car car) {
         carService.create(car);
-        return "redirect:listCar";
+        return "redirect:list";
     }
 
-    @GetMapping("/listCar")
+    @GetMapping("/list")
     public String carListPage(Model model) {
         List<Car> allCars = carService.findAll();
         model.addAttribute("cars", allCars);
         return "CarList";
     }
 
-    @GetMapping("/editCar/{carId}")
+    @GetMapping("/edit/{carId}")
     public String editCarPage(@PathVariable String carId, Model model) {
         Car car = carService.findById(carId);
         model.addAttribute("car", car);
         return "EditCar";
     }
 
-    @PostMapping("/editCar")
+    @PostMapping("/edit")
     public String editCarPost(@ModelAttribute Car car, Model model) {
         System.out.println(car.getCarId());
         carService.update(car);
-        return "redirect:listCar";
+        return "redirect:list";
     }
 
-    @PostMapping("/deleteCar")
+    @PostMapping("/delete")
     public String deleteCar(@RequestParam("carId") String carId) {
         carService.deleteCarById(carId);
-        return "redirect:listCar";
+        return "redirect:list";
     }
 }
