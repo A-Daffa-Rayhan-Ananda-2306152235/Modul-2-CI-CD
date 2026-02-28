@@ -22,7 +22,7 @@ public class CarController {
     }
 
     @PostMapping("/createCar")
-    public String createCarPost(@ModelAttribute Car car, Model model) {
+    public String createCarPost(@ModelAttribute Car car) {
         carService.create(car);
         return "redirect:listCar";
     }
