@@ -34,9 +34,9 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void update(String carId, Car car) {
+    public void update(Car car) {
         // TODO Auto-generated method stub
-        carRepository.update(carId, car);
+        carRepository.update(car);
     }
 
     @Override

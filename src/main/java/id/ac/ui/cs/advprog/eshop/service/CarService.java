@@ -9,7 +9,7 @@ public interface CarService {
 
     Car findById(String carId);
 
-    public void update(String carId, Car car);
+    public void update(Car car);
 
     public void deleteCarById(String carId);
 }
