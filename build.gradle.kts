@@ -9,6 +9,7 @@ plugins {
     id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.sonarqube") version "7.1.0.6387"
+    kotlin("jvm")
 }
 
 group = "id.ac.ui.cs.advprog"
@@ -54,6 +55,7 @@ dependencies {
     testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.register<Test>("unitTest") {
