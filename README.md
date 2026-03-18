@@ -51,3 +51,18 @@
     - **Rigid:** We have to change the codebase a lot if we add new features.
     - **Redundant:** There will be a lot of clients that implement unrelevant tasks.
     - **Not Testable:** We have to create a lot of unit tests.
+
+### Module 4 Reflection
+1. **Reflection on TDD Workflow**
+    
+    In module 4, I followed Red-Green-Refactor workflow. This flow is highly useful as it ensures that every line of code is written to satisfy a specific
+    requirement. By writing tests first, I clearly defined the expected behavior of the `Order` model, repository, and service before implementation.
+
+2. **Reflection on F.I.R.S.T Principles**
+    
+    I have reviewed the unit tests created for the `Order` model, `OrderRepository`, and `OrderService` against the F.I.R.S.T principles:
+    - **Fast:** The tests run very quickly.
+    - **Independent:** Each test case is isolated and does not depend on the other tests.
+    - **Repeatable:** The use of `@BeforeEach` to set up fresh objects for every test ensures that they can be run with consistent results.
+    - **Self-Validating:** Each test uses assertions to validate itself.
+    - **Timely:** The tests were written before the production code.
