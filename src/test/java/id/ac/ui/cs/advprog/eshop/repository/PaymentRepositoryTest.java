@@ -3,7 +3,9 @@ package id.ac.ui.cs.advprog.eshop.repository;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentDataKey;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentMethod;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentStatus;
+import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
+import id.ac.ui.cs.advprog.eshop.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,15 +25,23 @@ class PaymentRepositoryTest {
         paymentRepository = new PaymentRepository();
         payments = new ArrayList<>();
 
+        List<Product> products = new ArrayList<>();
+        Product product = new Product();
+        product.setProductId("prod-1");
+        product.setProductName("Test Product");
+        product.setProductQuantity(1);
+        products.add(product);
+        Order order = new Order("order-123", products, 1708560000L, "Safira");
+
         Map<String, String> voucherData = new HashMap<>();
         voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP1234ABC5678");
-        Payment payment1 = new Payment("payment-1", PaymentMethod.VOUCHER.getValue(), voucherData);
+        Payment payment1 = new Payment("payment-1", order, PaymentMethod.VOUCHER.getValue(), voucherData);
         payments.add(payment1);
 
         Map<String, String> codData = new HashMap<>();
         codData.put(PaymentDataKey.ADDRESS.getValue(), "Jalan Kenangan 123");
         codData.put(PaymentDataKey.DELIVERY_FEE.getValue(), "10000");
-        Payment payment2 = new Payment("payment-2", PaymentMethod.CASH_ON_DELIVERY.getValue(), codData);
+        Payment payment2 = new Payment("payment-2", order, PaymentMethod.CASH_ON_DELIVERY.getValue(), codData);
         payments.add(payment2);
     }
 
