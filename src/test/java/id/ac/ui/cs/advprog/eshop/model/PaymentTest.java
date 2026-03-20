@@ -19,6 +19,7 @@ class PaymentTest {
     @BeforeEach
     void setup() {
         this.voucherData = new HashMap<>();
+        // Valid voucher: 16 chars, starts with ESHOP, exactly 8 digits
         this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP1234ABC5678");
 
         this.codData = new HashMap<>();
@@ -26,7 +27,7 @@ class PaymentTest {
         this.codData.put(PaymentDataKey.DELIVERY_FEE.getValue(), "10000");
     }
 
-    // --- HAPPY PATHS (Should default to WAITING) ---
+    // --- HAPPY PATHS ---
 
     @Test
     void testCreatePaymentVoucherSuccess() {
@@ -40,7 +41,34 @@ class PaymentTest {
         assertEquals(PaymentStatus.WAITING.getValue(), payment.getStatus());
     }
 
-    // --- UNHAPPY PATHS (Should default to REJECTED instead of throwing errors) ---
+    // --- VOUCHER SPECIFIC BUSINESS LOGIC TESTS ---
+
+    @Test
+    void testCreatePaymentVoucherInvalidLength() {
+        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP123"); // Too short
+        Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+    }
+
+    @Test
+    void testCreatePaymentVoucherDoesNotStartWithEshop() {
+        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "CORPZ1234ABC5678"); // Doesn't start with ESHOP
+        Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+    }
+
+    @Test
+    void testCreatePaymentVoucherNotExactlyEightDigits() {
+        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP12ABCDEFGH3"); // Only 3 digits
+        Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+
+        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP12345678901"); // 11 digits
+        Payment payment2 = new Payment("payment-124", PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        assertEquals(PaymentStatus.REJECTED.getValue(), payment2.getStatus());
+    }
+
+    // --- UNHAPPY PATHS (Missing/Extra Data) ---
 
     @Test
     void testCreatePaymentEmptyPaymentData() {
@@ -51,32 +79,35 @@ class PaymentTest {
 
     @Test
     void testCreatePaymentVoucherWithExtraData() {
-        this.voucherData.put("extraKey", "unusedData"); // Map size > 1
+        this.voucherData.put("extraKey", "unusedData");
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
     }
 
     @Test
     void testCreatePaymentCODWithMissingData() {
-        this.codData.remove(PaymentDataKey.DELIVERY_FEE.getValue()); // Map size < 2
+        this.codData.remove(PaymentDataKey.DELIVERY_FEE.getValue());
         Payment payment = new Payment("payment-456", PaymentMethod.CASH_ON_DELIVERY.getValue(), this.codData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
     }
 
-    @Test
-    void testCreatePaymentWithEmptyStringValue() {
-        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), ""); // Empty value
-        Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
-        assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
-    }
-
-    // --- INVALID METHOD OR STATUS (Still throws exception because it's a developer error) ---
+    // --- METHOD & STATUS TESTS ---
 
     @Test
     void testCreatePaymentInvalidMethod() {
         assertThrows(IllegalArgumentException.class, () -> {
             new Payment("payment-123", "MAGIC_SPELL", this.voucherData);
         });
+    }
+
+    @Test
+    void testSetValidStatus() {
+        Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        payment.setStatus(PaymentStatus.SUCCESS.getValue());
+        assertEquals(PaymentStatus.SUCCESS.getValue(), payment.getStatus());
+
+        payment.setStatus(PaymentStatus.REJECTED.getValue());
+        assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
     }
 
     @Test
