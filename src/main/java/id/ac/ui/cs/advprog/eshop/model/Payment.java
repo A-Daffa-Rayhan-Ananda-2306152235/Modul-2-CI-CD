@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.model;
 
+import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentStatus;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentMethod;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentDataKey;
@@ -17,11 +18,17 @@ public class Payment {
 
     public Payment(String id, Order order, String method, Map<String, String> paymentData) {
         this.id = id;
-        this.paymentData = paymentData;
-
+        if (order == null) {
+            throw new IllegalArgumentException("Order cannot be null");
+        }
+        if (!OrderStatus.WAITING_PAYMENT.getValue().equals(order.getStatus())) {
+            throw new IllegalArgumentException("Order must be WAITING_PAYMENT");
+        }
         if (method == null || !PaymentMethod.contains(method)) {
             throw new IllegalArgumentException("Invalid payment method");
         }
+        this.order = order;
+        this.paymentData = paymentData;
         this.method = method;
 
         boolean isDataValid = true;
@@ -68,12 +75,20 @@ public class Payment {
             this.status = PaymentStatus.WAITING.getValue();
         } else {
             this.status = PaymentStatus.REJECTED.getValue();
+            this.order.setStatus(OrderStatus.FAILED.getValue());
         }
     }
 
     public void setStatus(String status) {
         if (PaymentStatus.contains(status)) {
             this.status = status;
+            if (status.equals(PaymentStatus.SUCCESS.getValue())) {
+                this.order.setStatus(OrderStatus.SUCCESS.getValue());
+            } else if (status.equals(PaymentStatus.REJECTED.getValue())) {
+                this.order.setStatus(OrderStatus.FAILED.getValue());
+            } else if (status.equals(PaymentStatus.WAITING.getValue())) {
+                this.order.setStatus(OrderStatus.WAITING_PAYMENT.getValue());
+            }
         } else {
             throw new IllegalArgumentException();
         }
