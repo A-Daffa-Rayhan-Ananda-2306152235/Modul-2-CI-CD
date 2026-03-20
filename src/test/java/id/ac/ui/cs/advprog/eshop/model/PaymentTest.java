@@ -73,14 +73,17 @@ class PaymentTest {
     }
 
     @Test
-    void testCreatePaymentVoucherNotExactlyEightDigits() {
-        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP12ABCDEFGH3"); // Only 3 digits
+    void testCreatePaymentVoucherLessThanEightDigits() {
+        this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP12ABCDEFGH3"); // 3 digits
         Payment payment = new Payment("payment-123", this.order, PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+    }
 
+    @Test
+    void testCreatePaymentVoucherMoreThanEightDigits() {
         this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP12345678901"); // 11 digits
-        Payment payment2 = new Payment("payment-124", this.order, PaymentMethod.VOUCHER.getValue(), this.voucherData);
-        assertEquals(PaymentStatus.REJECTED.getValue(), payment2.getStatus());
+        Payment payment = new Payment("payment-124", this.order, PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
     }
 
     // --- UNHAPPY PATHS (Missing/Extra Data) ---
