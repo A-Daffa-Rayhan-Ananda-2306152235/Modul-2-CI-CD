@@ -1,12 +1,15 @@
 package id.ac.ui.cs.advprog.eshop.model;
 
+import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentStatus;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentMethod;
 import id.ac.ui.cs.advprog.eshop.enums.PaymentDataKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +18,7 @@ class PaymentTest {
 
     private Map<String, String> voucherData;
     private Map<String, String> codData;
+    private Order order;
 
     @BeforeEach
     void setup() {
@@ -25,6 +29,15 @@ class PaymentTest {
         this.codData = new HashMap<>();
         this.codData.put(PaymentDataKey.ADDRESS.getValue(), "Jalan Kenangan 123");
         this.codData.put(PaymentDataKey.DELIVERY_FEE.getValue(), "10000");
+
+        // Set up a valid dummy order
+        List<Product> products = new ArrayList<>();
+        Product product = new Product();
+        product.setProductId("prod-1");
+        product.setProductName("Test Product");
+        product.setProductQuantity(1);
+        products.add(product);
+        this.order = new Order("order-123", products, 1708560000L, "Safira");
     }
 
     // --- HAPPY PATHS ---
@@ -48,6 +61,7 @@ class PaymentTest {
         this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "ESHOP123"); // Too short
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), payment.getOrder().getStatus());
     }
 
     @Test
@@ -55,6 +69,7 @@ class PaymentTest {
         this.voucherData.put(PaymentDataKey.VOUCHER_CODE.getValue(), "CORPZ1234ABC5678"); // Doesn't start with ESHOP
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), payment.getOrder().getStatus());
     }
 
     @Test
@@ -75,6 +90,7 @@ class PaymentTest {
         this.voucherData.clear();
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), payment.getOrder().getStatus());
     }
 
     @Test
@@ -82,6 +98,7 @@ class PaymentTest {
         this.voucherData.put("extraKey", "unusedData");
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), payment.getOrder().getStatus());
     }
 
     @Test
@@ -89,6 +106,7 @@ class PaymentTest {
         this.codData.remove(PaymentDataKey.DELIVERY_FEE.getValue());
         Payment payment = new Payment("payment-456", PaymentMethod.CASH_ON_DELIVERY.getValue(), this.codData);
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), payment.getOrder().getStatus());
     }
 
     // --- METHOD & STATUS TESTS ---
@@ -105,9 +123,11 @@ class PaymentTest {
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         payment.setStatus(PaymentStatus.SUCCESS.getValue());
         assertEquals(PaymentStatus.SUCCESS.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.SUCCESS.getValue(), payment.getOrder().getStatus());
 
         payment.setStatus(PaymentStatus.REJECTED.getValue());
         assertEquals(PaymentStatus.REJECTED.getValue(), payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), payment.getOrder().getStatus());
     }
 
     @Test
@@ -115,6 +135,25 @@ class PaymentTest {
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(), this.voucherData);
         assertThrows(IllegalArgumentException.class, () -> {
             payment.setStatus("MEOW");
+        });
+    }
+
+    // --- ORDER VALIDATION TESTS ---
+
+    @Test
+    void testCreatePaymentWithNullOrder() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Payment("payment-123", null, PaymentMethod.VOUCHER.getValue(), this.voucherData);
+        });
+    }
+
+    @Test
+    void testCreatePaymentWithInvalidOrderStatus() {
+        // Change order status to something other than WAITING_PAYMENT
+        this.order.setStatus(OrderStatus.SUCCESS.getValue());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Payment("payment-123", this.order, PaymentMethod.VOUCHER.getValue(), this.voucherData);
         });
     }
 }
