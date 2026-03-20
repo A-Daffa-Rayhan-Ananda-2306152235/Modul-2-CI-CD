@@ -10,11 +10,12 @@ import java.util.Map;
 @Getter
 public class Payment {
     String id;
+    Order order;
     String method;
     String status;
     Map<String, String> paymentData;
 
-    public Payment(String id, String method, Map<String, String> paymentData) {
+    public Payment(String id, Order order, String method, Map<String, String> paymentData) {
         this.id = id;
         this.paymentData = paymentData;
 
