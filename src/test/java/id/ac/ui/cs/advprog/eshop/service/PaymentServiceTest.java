@@ -33,9 +33,6 @@ class PaymentServiceTest {
     @Mock
     PaymentRepository paymentRepository;
 
-    @Mock
-    OrderRepository orderRepository;
-
     private Order order;
     private Map<String, String> voucherData;
 
@@ -71,14 +68,12 @@ class PaymentServiceTest {
         Payment payment = new Payment("payment-123", order, PaymentMethod.VOUCHER.getValue(), voucherData);
         doReturn(payment).when(paymentRepository).findById(payment.getId());
         doReturn(payment).when(paymentRepository).save(payment);
-        doReturn(order).when(orderRepository).save(order);
 
         Payment result = paymentService.setStatus(payment, PaymentStatus.SUCCESS.getValue());
 
         assertEquals(PaymentStatus.SUCCESS.getValue(), result.getStatus());
         assertEquals(OrderStatus.SUCCESS.getValue(), result.getOrder().getStatus());
         verify(paymentRepository, times(1)).save(payment);
-        verify(orderRepository, times(1)).save(order);
     }
 
     @Test
@@ -86,14 +81,12 @@ class PaymentServiceTest {
         Payment payment = new Payment("payment-123", order, PaymentMethod.VOUCHER.getValue(), voucherData);
         doReturn(payment).when(paymentRepository).findById(payment.getId());
         doReturn(payment).when(paymentRepository).save(payment);
-        doReturn(order).when(orderRepository).save(order);
 
         Payment result = paymentService.setStatus(payment, PaymentStatus.REJECTED.getValue());
 
         assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
         assertEquals(OrderStatus.FAILED.getValue(), result.getOrder().getStatus());
         verify(paymentRepository, times(1)).save(payment);
-        verify(orderRepository, times(1)).save(order);
     }
 
     @Test
