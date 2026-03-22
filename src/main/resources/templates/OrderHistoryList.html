@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Orders</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2 th:text="'Order History for ' + ${author}">Order History</h2>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}">
+      <td th:text="${order.id}"></td>
+      <td th:text="${order.status}"></td>
+      <td>
+        <a th:if="${order.status == 'WAITING_PAYMENT'}"
+           th:href="@{/order/pay/{id}(id=${order.id})}" class="btn btn-success btn-sm">Pay</a>
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(orders)}">
+      <td colspan="3" class="text-center">No orders found.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
