@@ -18,16 +18,23 @@ public class OrderController {
 
     @GetMapping("/create")
     public String createOrderPage() {
-        return null;
+        return "CreateOrder";
     }
+
+    // Note: The actual POST /order/create logic wasn't explicitly requested in the PDF's endpoint list,
+    // but usually you'd have a POST mapping here to handle the form submission.
+    // For the sake of the PDF instructions, we will focus on what was requested.
 
     @GetMapping("/history")
     public String historyOrderPage() {
-        return null;
+        return "OrderHistoryForm";
     }
 
     @PostMapping("/history")
     public String historyOrderPost(@RequestParam("author") String author, Model model) {
-        return null;
+        List<Order> orders = orderService.findAllByAuthor(author);
+        model.addAttribute("orders", orders);
+        model.addAttribute("author", author);
+        return "OrderHistoryList";
     }
 }
