@@ -29,14 +29,14 @@ class OrderControllerTest {
     void testGetCreateOrderPage() throws Exception {
         mockMvc.perform(get("/order/create"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("createOrder"));
+                .andExpect(view().name("CreateOrder"));
     }
 
     @Test
     void testGetOrderHistoryPage() throws Exception {
         mockMvc.perform(get("/order/history"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("orderHistoryForm"));
+                .andExpect(view().name("OrderHistoryForm"));
     }
 
     @Test
@@ -46,7 +46,7 @@ class OrderControllerTest {
         mockMvc.perform(post("/order/history")
                         .param("author", "Safira"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("orderHistoryList"))
+                .andExpect(view().name("OrderHistoryList"))
                 .andExpect(model().attributeExists("orders"))
                 .andExpect(model().attribute("author", "Safira"));
     }
